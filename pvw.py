@@ -14,6 +14,7 @@ from docker import errors
 logging.basicConfig(level=logging.INFO)
 DOCKER_CLI =  Client(base_url = 'tcp://10.0.0.24:2375')
 HOST_IP = '10.0.0.24'
+USED_PORTS = set()
 
 class NoPortError(StandardError):
      pass
@@ -26,12 +27,14 @@ def Is_open(ip,port):
         logging.info( '%d is open' % port)
         return True
     except:
+        logging.exception('sockect connet error')
         logging.info( '%d is down' % port)
         return False
 
 def find_port():
     for port in range(9000,10000):
-        if not Is_open(HOST_IP, port):
+        if not port in USED_PORTS and not Is_open(HOST_IP, port):
+            USED_PORTS.add(port)
             return port
     raise NoPortError()
 
@@ -40,6 +43,7 @@ class ParaviewApp(object):
     def __init__(self, filename):
         super(ParaviewApp, self).__init__()
         self.filename = filename
+        self._url = None
 
     @property
     def url(self):
