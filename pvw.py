@@ -11,6 +11,9 @@ import socket
 from docker import Client
 from docker import errors
 
+from docker_util import get_container_stats
+from docker_util import get_current_state
+
 logging.basicConfig(level=logging.INFO)
 DOCKER_CLI =  Client(base_url = 'tcp://10.0.0.24:2375')
 HOST_IP = '10.0.0.24'
@@ -44,6 +47,7 @@ class ParaviewApp(object):
         super(ParaviewApp, self).__init__()
         self.filename = filename
         self._url = None
+        self._stats_generator = None
 
     @property
     def url(self):
@@ -76,12 +80,39 @@ class ParaviewApp(object):
             self._url = 'http://10.0.0.24:%d/apps/Visualizer/' % port
 
 
-    def stop(self):
-        DOCKER_CLI.stop(container = self._container_id)
+    def _stop(self):
+        try:
+            DOCKER_CLI.stop(container = self._container_id)
+            self._stats_generator = None
+        except Exception, e:
+            logging.exception('stop container failed, id: %s' % self._container_id)
 
-    def remove(self):
-        DOCKER_CLI.remove_container(container=self._container_id)
+
+    def _remove(self):
+        try:
+            DOCKER_CLI.remove_container(container=self._container_id)
+            self._container_id = None
+            self._container = None
+        except Exception, e:
+            logging.exception('remove container failed, id: %s' % self._container_id)
+
+
+    def state(self):
+        if self._container_id is None:
+            return
+        if self._stats_generator is None:
+            self._stats_generator = get_container_stats(DOCKER_CLI, self._container_id)
+        return get_current_state(self._stats_generator.next())
+
+    def is_running(self):
+        try:
+            ins = DOCKER_CLI.inspect_container(self._container_id)
+            return ins.get('State').get('Running')
+        except Exception, e:
+            logging.exception('check container running error. container_id:%s' % self._container_id)
+            return False
+
 
     def close(self):
-        self.stop()
-        self.remove()
+        self._stop()
+        self._remove()

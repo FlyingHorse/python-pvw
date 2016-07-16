@@ -19,7 +19,7 @@ for i in range(0,10):
     print pv.url
     pvs.append(pv)
 
-time.sleep(200)
+time.sleep(1200)
 
 for pv in pvs:
     pv.close()
