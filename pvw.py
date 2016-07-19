@@ -30,7 +30,7 @@ def Is_open(ip,port):
         logging.info( '%d is open' % port)
         return True
     except:
-        logging.exception('sockect connet error')
+        #logging.exception('sockect connet error')
         logging.info( '%d is down' % port)
         return False
 
@@ -91,6 +91,7 @@ class ParaviewApp(object):
     def _remove(self):
         try:
             DOCKER_CLI.remove_container(container=self._container_id)
+            self._stats_generator = None
             self._container_id = None
             self._container = None
         except Exception, e:
@@ -100,12 +101,17 @@ class ParaviewApp(object):
     def state(self):
         if self._container_id is None:
             return
+        if not self.is_running():
+            self._remove()
+            return
         if self._stats_generator is None:
             self._stats_generator = get_container_stats(DOCKER_CLI, self._container_id)
         return get_current_state(self._stats_generator.next())
 
     def is_running(self):
         try:
+            if self._container_id is None:
+                return False
             ins = DOCKER_CLI.inspect_container(self._container_id)
             return ins.get('State').get('Running')
         except Exception, e:

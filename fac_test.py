@@ -5,23 +5,38 @@
 # @Link    : https://github.com/FlyingHorse
 # @Version : $Id$
 
-import time
+import time,threading,logging
+from multiprocessing.dummy import Pool
 from pvw_factory import PvwAppFactory
+from selenium_pvw import simu_pvw
+
+logging.basicConfig(level= logging.INFO,
+                    filename= 'test.log',
+                    filemode='w')
 
 fac = PvwAppFactory()
 
-print 'app num inital %d' % fac.app_num()
+num = 40
 
-for i in range(0,5):
-    app = fac.start_pvw()
-    print 'start pvw %i, url: %s' %(i, app.url)
+urls = []
 
-for i in range(0,10):
-    for url,state in fac.states().items():
-        print '%s : %s' % (url, state)
-    time.sleep(1)
+try:
+    for i in range(0,num):
+        app = fac.start_pvw()
+        urls.append(app.url)
+        print( 'start pvw %i, url: %s' %(i, app.url))
 
-fac.destroy()
-print 'test finish'
+
+    for i in range(0,num):
+        t = threading.Thread(target = simu_pvw, args=(urls[i],))
+        t.start()
+
+    for i in range(0,400):
+        for url,state in fac.states().items():
+            print( '%s : %s' % (url, state))
+        time.sleep(1)
+finally:
+    fac.destroy()
+    print( 'test finish')
 
 

@@ -19,8 +19,8 @@ print pv1.url
 print pv1.is_running()
 
 try:
-    for i in range(0,2):
-        print pv1.state()
+    for i in range(0,600):
+        #print pv1.state()
         time.sleep(1)
 except:
     logging.exception('error occurred')
