@@ -13,9 +13,6 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-logging.basicConfig(level= logging.INFO,
-                    filename= 'test_sele.log',
-                    filemode='w')
 
 FILES = ['/html/body/div/div[2]/div[1]/div[2]/div/div[4]/ul/li[42]',
 '/html/body/div/div[2]/div[1]/div[2]/div/div[4]/ul/li[38]',
@@ -25,7 +22,7 @@ FILES = ['/html/body/div/div[2]/div[1]/div[2]/div/div[4]/ul/li[42]',
 '/html/body/div/div[2]/div[1]/div[2]/div/div[4]/ul/li[32]',
 ]
 
-def simu_pvw(url):
+def simu_pvw(url, times=200):
 
     try:
         brw = webdriver.Firefox()
@@ -34,7 +31,7 @@ def simu_pvw(url):
         brw.get(url)
         WebDriverWait(brw, 60, 0.5).until(EC.presence_of_element_located((By.XPATH, '/html/body/div/div[1]/div[1]/span[2]')))
         end = time.time()
-        print( '%s use time % s' % (url, end - start))
+        logging.info( '%s use time % s' % (url, end - start))
 
         brw.set_window_size(1800,800)
 
@@ -53,7 +50,6 @@ def simu_pvw(url):
         sec = random.randint(0,5)
         while sec == first:
             sec = random.randint(0,5)
-        print sec
 
         #another data file
             #点击file
@@ -86,7 +82,7 @@ def simu_pvw(url):
 
         xoffset = random.randint(0,200)
         yoffset = random.randint(0,50)
-        for i in range(0,300):
+        for i in range(0,times):
             if xoffset > 0:
                 xoffset = 0 - random.randint(0,200)
             else:
@@ -95,7 +91,7 @@ def simu_pvw(url):
                 yoffset = 0 - random.randint(0,50)
             else:
                 yoffset = random.randint(0,50)
-            print( '%s,  count: %d, xoff:%d, yoff:%d' % (url, i, xoffset, yoffset))
+            logging.info( '%s,  count: %d, xoff:%d, yoff:%d' % (url, i, xoffset, yoffset))
             ActionChains(brw).click_and_hold().move_by_offset(xoffset, yoffset).release().perform()
             time.sleep(random.uniform(0,1.5))
 

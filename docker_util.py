@@ -10,7 +10,7 @@ import json,logging
 from docker import Client
 
 
-logging.basicConfig(level=logging.INFO)
+#logging.basicConfig(level=logging.INFO)
 
 def calculate_cpu_percent(stats):
     cpu1 = stats['precpu_stats']['cpu_usage']['total_usage']

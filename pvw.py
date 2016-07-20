@@ -14,7 +14,7 @@ from docker import errors
 from docker_util import get_container_stats
 from docker_util import get_current_state
 
-logging.basicConfig(level=logging.INFO)
+#logging.basicConfig(level=logging.INFO)
 DOCKER_CLI =  Client(base_url = 'tcp://10.0.0.24:2375')
 HOST_IP = '10.0.0.24'
 USED_PORTS = set()
