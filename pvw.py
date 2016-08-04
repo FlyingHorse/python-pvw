@@ -63,7 +63,7 @@ class ParaviewApp(object):
                                           host_config = DOCKER_CLI.create_host_config(port_bindings={
                                                                                       port:port
                                                                                       },
-                                                                                      binds=['/home/tools/paraview/import/:/import/','/home/tools/paraview/export/:/export/' ])
+                                                                                      binds=['/home/cn-04/gs/:/import/','/home/tools/paraview/export/:/export/' ])
                                           )
             print self._container
             self._container_id = self._container.get('Id')
